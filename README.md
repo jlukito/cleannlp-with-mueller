@@ -5,12 +5,8 @@ April 18, 2019
 
 ``` r
 library(tidyverse)
-library(ggplot2)
 library(RCurl)
 library(tokenizers)
-library(dplyr)
-library(reticulate)
-
 library(cleanNLP)
 ```
 
