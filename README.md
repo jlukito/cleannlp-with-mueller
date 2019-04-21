@@ -12,7 +12,7 @@ library(cleanNLP)
 
 Our goal today is to use `cleanNLP` to analyze the Mueller Report. `cleanNLP` is a popular text analysis tool for specific advanced natural language processing (NLP) tasks. It is especially useful for doing 3 NLP tasks in R: part-of-speech tagging, dependency parsing, and entity recognition. Combined, researchers can use these three tools to do really interesting computational linguistic analysis, like identifying syntactic constructions, attributing sentiment words to specific entities or nouns, or comparing grammars in different genres.
 
-cleanNLP documentation: <https://cran.r-project.org/web/packages/cleanNLP/cleanNLP.pdf>
+cleanNLP documentation: <https://cran.r-project.org/web/packages/cleanNLP/cleanNLP.pdf>  
 Data source: <https://github.com/gadenbuie/mueller-report>
 
 Importing the data
