@@ -118,7 +118,7 @@ top_entities[order(-top_entities$Freq),]
 Dependency Parsing
 ==================
 
-Universal Dependencies: <http://universaldependencies.org/u/dep/index.html>)
+Universal Dependencies: <http://universaldependencies.org/u/dep/index.html>
 
 ``` r
 spacy_dependency <- cnlp_get_dependency(spacy_annotate, get_token = TRUE)
