@@ -31,7 +31,7 @@ Initializing
 
 The first thing we need to do is initialize the back-ends.
 
-spaCy and coreNLP downloading: <https://github.com/statsmaths/cleanNLP>)
+spaCy and coreNLP downloading: <https://github.com/statsmaths/cleanNLP>
 
 ``` r
 #cnlp_init_corenlp("en", anno_level = 2)
