@@ -174,4 +174,4 @@ ggplot(trump_nsubj_verb, aes(x = reorder(Var1, Freq), y = Freq)) +
                           plot.title=element_text(size=14))
 ```
 
-![](dependency_mueller_files/figure-markdown_github/spacy-mueller-table-1.png)
+![](spacy-mueller-table-1.png)
