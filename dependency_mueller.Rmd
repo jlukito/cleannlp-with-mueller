@@ -1,0 +1,93 @@
+---
+title: "An analysis of the redacted Mueller report using clearNLP"
+author: "jlukito"
+date: "April 18, 2019"
+output: html_document
+---
+
+```{r setup, , message=FALSE, warning=FALSE}
+library(tidyverse)
+library(ggplot2)
+library(RCurl)
+library(tokenizers)
+library(dplyr)
+library(reticulate)
+
+library(cleanNLP)
+```
+
+Our goal today is to use `cleanNLP` to analyze the Mueller Report. `cleanNLP` is a popular text analysis tool for specific advanced natural language processing (NLP) tasks. It is especially useful for doing 3 NLP tasks in R: part-of-speech tagging, dependency parsing, and entity recognition. Combined, researchers can use these three tools to do really interesting computational linguistic analysis, like identifying syntactic constructions, attributing sentiment words to specific entities or nouns, or comparing grammars in different genres. 
+
+cleanNLP documentation: [link](https://cran.r-project.org/web/packages/cleanNLP/cleanNLP.pdf){target="_blank"}
+
+#Importing the data
+```{r importdata}
+data <- read.csv("mueller_report.csv")
+mreport <- paste(as.character(data$text), " ")
+```
+
+# Initializing
+The first thing we need to do is initialize the back-ends.  
+
+spaCy and coreNLP downloading: [link](https://github.com/statsmaths/cleanNLP){target="_blank"}  
+```{r initializing}
+#cnlp_init_corenlp("en", anno_level = 2)
+
+cnlp_init_spacy("en_core_web_sm") #sometimes, cnlp_init_spacy() works without denoting the annotation
+```
+
+#Tokenizing
+```{r spacy-annotate}
+starttime <- Sys.time()
+spacy_annotate<- mreport %>% as.character() %>% cnlp_annotate(as_strings = TRUE, backend = "spaCy") #produces an annotation object
+endtime <- Sys.time()
+```
+
+#Entity Recognition
+For a list of `spaCy` entities, see the `cleanNLP` documentation: https://cran.r-project.org/web/packages/cleanNLP/cleanNLP.pdf 
+```{r spacy_entity}
+starttime <- Sys.time()
+spacy_entity <- cnlp_get_entity(spacy_annotate)
+endtime <- Sys.time()
+```
+
+```{r spacy-entity-table}
+top_entities <- table(spacy_entity$entity) %>% as.data.frame() %>% subset(Freq > 3)
+top_entities[order(-top_entities$Freq),]
+```
+
+#Dependency Parsing
+Universal Dependencies: [link](http://universaldependencies.org/u/dep/index.html){target="_blank"} (simple)
+
+```{r spacy-dep}
+starttime <- Sys.time()
+spacy_dependency <- cnlp_get_dependency(spacy_annotate, get_token = TRUE)
+endtime <- Sys.time()
+```
+
+```{r spacy-mueller-subset}
+tsubj <- subset(spacy_dependency, lemma_target == "Trump" & relation == "nsubj")
+tobj <- subset(spacy_dependency, lemma_target == "Trump" & relation == "dobj")
+```
+
+```{r spacy-mueller-display}
+knitr::kable(spacy_dependency[1:10,], caption = "spaCy Mueller Report Trump dependencies")
+
+trump_nsubj_verb <- table(tsubj$lemma) %>% as.data.frame() %>% subset(Freq > 1)
+```
+
+```{r spacy-mueller-table}
+ggplot(trump_nsubj_verb, aes(x = reorder(Var1, Freq), y = Freq)) +
+  geom_bar(stat = "identity") + coord_flip() + 
+  scale_y_continuous(breaks = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)) +
+  labs(title = "Combinations of \"Trump\" + Lemmatized Verbs in the Mueller Report",
+       subtitle = "",
+       x = "Lemmatized Verb",
+       y = "Frequency of Occurance",
+       caption = "Data from @grrrck, https://github.com/gadenbuie/mueller-report \n Parsed using spaCy back-end in cleanNLP by @josephinelukito \n Lemmatized verbs occuring once were excluded.") +
+  
+  theme_minimal() + theme(text = element_text(family = "Decima WE"),
+                          plot.subtitle=element_text(face="italic",size=11,colour="grey40"),
+                          plot.caption=element_text(face ="bold",size=8,colour="grey30"),
+                          plot.title=element_text(size=14))
+```
